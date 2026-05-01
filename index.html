@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book a Consultation — Building Clinic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:       #0f0f0f;
+    --ink-light: #6b6b6b;
+    --ink-faint: #b0b0b0;
+    --paper:     #fafaf8;
+    --paper-2:   #f2f1ee;
+    --rule:      #e2e0db;
+    --accent:    #1a3a2a;
+    --accent-2:  #2d5a40;
+    --avail:     #2d7a4f;
+    --booked:    #c0392b;
+    --avail-bg:  #edf7f1;
+    --booked-bg: #fdf0ee;
+    --glow:      rgba(26,58,42,0.08);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── AMBIENT BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 40% at 80% 10%, rgba(45,90,64,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 10% 90%, rgba(26,58,42,0.04) 0%, transparent 60%);
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    border-bottom: 1px solid var(--rule);
+    padding: 0 clamp(16px, 4vw, 80px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    background: rgba(250,250,248,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 100;
+    transition: box-shadow 0.3s;
+  }
+  header.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.06); }
+
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .logo:hover { color: var(--accent); }
+  .logo span { color: var(--accent); }
+
+  .header-tag {
+    font-size: clamp(0.6rem, 1.5vw, 0.7rem);
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: clamp(28px, 6vw, 100px) clamp(16px, 4vw, 80px) clamp(24px, 5vw, 72px);
+    border-bottom: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: end;
+    position: relative;
+    z-index: 1;
+    animation: heroReveal 0.7s cubic-bezier(0.16,1,0.3,1) both;
+  }
+
+  @keyframes heroReveal {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-eyebrow {
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 1px;
+    background: var(--accent);
+    animation: expandLine 0.8s 0.3s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  @keyframes expandLine {
+    from { width: 0; opacity: 0; }
+    to   { width: 20px; opacity: 1; }
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 6vw, 5rem);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+  }
+  h1 em { font-style: italic; color: var(--accent); }
+
+  .hero-meta {
+    margin-top: 20px;
+    display: flex;
+    gap: clamp(16px, 3vw, 32px);
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    animation: fadeUp 0.5s ease both;
+  }
+  .meta-item:nth-child(1) { animation-delay: 0.2s; }
+  .meta-item:nth-child(2) { animation-delay: 0.3s; }
+  .meta-item:nth-child(3) { animation-delay: 0.4s; }
+  .meta-item:nth-child(4) { animation-delay: 0.5s; }
+
+  .meta-label { font-size: 0.63rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+  .meta-value { font-size: 0.85rem; font-weight: 500; }
+
+  .hero-aside { text-align: right; flex-shrink: 0; }
+  .hero-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 7vw, 5rem);
+    font-weight: 300;
+    line-height: 1;
+    color: var(--rule);
+    letter-spacing: -0.04em;
+    transition: color 0.4s;
+    animation: fadeIn 1s 0.3s both;
+  }
+  .hero:hover .hero-mark { color: #d0cec9; }
+
+  /* ── MAIN GRID ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── CALENDAR PANEL ── */
+  .calendar-panel {
+    padding: clamp(24px, 4vw, 56px) clamp(16px, 4vw, 80px);
+    border-right: 1px solid var(--rule);
+    animation: fadeUp 0.5s 0.15s ease both;
+    min-width: 0;
+  }
+
+  .panel-title {
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .panel-title::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
+
+  .week-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    gap: 12px;
+  }
+  .week-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.1rem, 3vw, 1.4rem);
+    font-weight: 400;
+    text-align: center;
+    flex: 1;
+    transition: opacity 0.2s;
+  }
+  .week-label.changing { opacity: 0; }
+
+  .nav-btn {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border: 1px solid var(--rule);
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-light);
+    transition: all 0.2s;
+    font-size: 1rem;
+    touch-action: manipulation;
+    position: relative;
+    overflow: hidden;
+  }
+  .nav-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.2s;
+    z-index: 0;
+  }
+  .nav-btn span { position: relative; z-index: 1; transition: color 0.2s; }
+  .nav-btn:hover:not(:disabled)::after { transform: scaleX(1); }
+  .nav-btn:hover:not(:disabled) span { color: white; }
+  .nav-btn:hover:not(:disabled) { border-color: var(--accent); }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* Day grid */
+  .day-grid-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 24px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule) transparent;
+  }
+  .day-grid-wrapper::-webkit-scrollbar { height: 3px; }
+  .day-grid-wrapper::-webkit-scrollbar-thumb { background: var(--rule); }
+
+  .day-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(56px, 1fr));
+    gap: 6px;
+    min-width: 300px;
+  }
+
+  .day-col { display: flex; flex-direction: column; gap: 5px; }
+
+  .day-header {
+    text-align: center;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .day-name { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); display: block; }
+  .day-date { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.1rem, 3vw, 1.5rem); font-weight: 300; line-height: 1.2; }
+  .day-date.today { color: var(--accent); font-weight: 600; }
+
+  .slot-pill {
+    height: 28px;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(0.55rem, 1.2vw, 0.63rem);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: all 0.18s cubic-bezier(0.16,1,0.3,1);
+    border: 1px solid transparent;
+    touch-action: manipulation;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+  }
+  .slot-pill::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.3);
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+  }
+  .slot-pill.available:hover::before { transform: translateX(100%); }
+  .slot-pill.available { background: var(--avail-bg); color: var(--avail); border-color: #c3e6d0; }
+  .slot-pill.available:hover, .slot-pill.available:active {
+    background: var(--avail); color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(45,122,79,0.25);
+  }
+  .slot-pill.booked  { background: var(--booked-bg); color: var(--booked); border-color: #f0c8c4; cursor: not-allowed; }
+  .slot-pill.selected {
+    background: var(--accent); color: white; border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(26,58,42,0.3);
+  }
+  .slot-pill.past    { background: var(--paper-2); color: var(--ink-faint); cursor: not-allowed; border-color: var(--rule); }
+
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--ink-light); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .legend-dot.available { background: var(--avail); }
+  .legend-dot.booked    { background: var(--booked); }
+  .legend-dot.past      { background: var(--ink-faint); }
+
+  /* ── FORM PANEL ── */
+  .form-panel {
+    padding: clamp(24px, 4vw, 56px) clamp(16px, 3vw, 32px);
+    background: var(--paper);
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
+  .form-panel::-webkit-scrollbar { width: 4px; }
+  .form-panel::-webkit-scrollbar-track { background: transparent; }
+  .form-panel::-webkit-scrollbar-thumb { background: var(--rule); }
+
+  .selected-slot-display {
+    background: var(--accent);
+    color: white;
+    padding: 14px 16px;
+    margin-bottom: 24px;
+    display: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .selected-slot-display::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    top: -20px;
+    width: 80px;
+    height: 80px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
+  .selected-slot-display.visible {
+    display: block;
+    animation: slideIn 0.3s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(10px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .selected-slot-label { font-size: 0.63rem; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px; }
+  .selected-slot-value { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 400; }
+
+  .no-selection-prompt {
+    border: 1px dashed var(--rule);
+    padding: 20px 16px;
+    text-align: center;
+    margin-bottom: 24px;
+    color: var(--ink-faint);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    transition: border-color 0.3s, background 0.3s;
+    animation: pulse 3s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { border-color: var(--rule); }
+    50% { border-color: #c3d9cc; }
+  }
+
+  .form-group {
+    margin-bottom: 18px;
+    animation: fadeUp 0.4s ease both;
+    opacity: 0;
+  }
+  .form-group.visible { animation: fadeUp 0.4s ease both; opacity: 1; }
+
+  label {
+    display: block;
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 6px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .form-group:focus-within label { color: var(--accent); }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid var(--rule);
+    background: white;
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    appearance: none;
+    border-radius: 0;
+    min-height: 44px;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--glow);
+    background: #fff;
+  }
+  input::placeholder, textarea::placeholder { color: var(--ink-faint); }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  textarea { resize: vertical; min-height: 84px; line-height: 1.5; }
+
+  /* ── PHONE FIELD ── */
+  .phone-input-group {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--rule);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: white;
+  }
+  .phone-input-group:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--glow);
+  }
+  .phone-input-group input,
+  .phone-input-group .country-select-wrapper {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent;
+  }
+  .phone-input-group:focus-within input,
+  .phone-input-group:focus-within .country-select-wrapper {
+    box-shadow: none !important;
+  }
+
+  .country-select-wrapper {
+    position: relative;
+    flex-shrink: 0;
+    border-right: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+  }
+  .country-select-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 6px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b6b6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    pointer-events: none;
+  }
+  #countryCode {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    color: var(--ink);
+    padding: 11px 28px 11px 12px;
+    cursor: pointer;
+    min-height: 44px;
+    width: auto;
+    min-width: 96px;
+    box-shadow: none;
+  }
+  #countryCode:focus { box-shadow: none; }
+
+  #phoneNumber {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 11px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    background: transparent;
+    min-height: 44px;
+    min-width: 0;
+    color: var(--ink);
+  }
+  #phoneNumber:focus { box-shadow: none; border: none; }
+  #phoneNumber::placeholder { color: var(--ink-faint); }
+
+  .phone-hint {
+    font-size: 0.63rem;
+    color: var(--ink-faint);
+    margin-top: 5px;
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
+  }
+  .phone-hint.error { color: #c0392b; }
+
+  /* ── DURATION TOGGLE ── */
+  .duration-toggle { display: flex; border: 1px solid var(--rule); }
+  .duration-btn {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--ink-light);
+    background: white;
+    border: none;
+    border-right: 1px solid var(--rule);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+    min-height: 44px;
+    touch-action: manipulation;
+    position: relative;
+    overflow: hidden;
+  }
+  .duration-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1);
+    z-index: 0;
+  }
+  .duration-btn span { position: relative; z-index: 1; }
+  .duration-btn:last-child { border-right: none; }
+  .duration-btn.active::after { transform: scaleY(1); }
+  .duration-btn.active { color: white; }
+  .duration-btn:not(.active):hover { background: var(--paper-2); }
+
+  .duration-note { font-size: 0.68rem; color: var(--ink-faint); margin-top: 6px; line-height: 1.4; transition: all 0.2s; }
+
+  /* ── SUBMIT BUTTON ── */
+  .submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 48px;
+    touch-action: manipulation;
+    position: relative;
+    overflow: hidden;
+  }
+  .submit-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+  }
+  .submit-btn:hover:not(:disabled)::before { transform: translateX(100%); }
+  .submit-btn:hover:not(:disabled) {
+    background: var(--accent-2);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(26,58,42,0.25);
+  }
+  .submit-btn:active:not(:disabled) { transform: translateY(0); box-shadow: none; }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .submit-arrow {
+    display: inline-block;
+    transition: transform 0.2s;
+  }
+  .submit-btn:hover:not(:disabled) .submit-arrow { transform: translateX(4px); }
+
+  /* ── SUCCESS ── */
+  .success-state { display: none; text-align: center; padding: 40px 16px; }
+  .success-state.visible { display: block; animation: fadeUp 0.5s ease both; }
+  .success-icon {
+    width: 56px; height: 56px;
+    border: 1px solid var(--avail);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    color: var(--avail);
+    font-size: 1.4rem;
+    animation: scaleIn 0.4s cubic-bezier(0.16,1,0.3,1) 0.1s both;
+  }
+  @keyframes scaleIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+  .success-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 400; margin-bottom: 12px; }
+  .success-text { font-size: 0.85rem; color: var(--ink-light); line-height: 1.7; }
+
+  /* ── INFO STRIP ── */
+  .info-strip {
+    border-top: 1px solid var(--rule);
+    padding: clamp(20px, 4vw, 28px) clamp(16px, 4vw, 80px);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 20px;
+    background: var(--paper-2);
+    position: relative;
+    z-index: 1;
+  }
+  .info-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    transition: transform 0.2s;
+  }
+  .info-item:hover { transform: translateY(-2px); }
+  .info-icon {
+    width: 36px; height: 36px; min-width: 36px;
+    border: 1px solid var(--rule);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .info-item:hover .info-icon { border-color: var(--accent); background: var(--avail-bg); }
+  .info-label { font-size: 0.63rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 3px; }
+  .info-value { font-size: 0.83rem; font-weight: 500; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* Form field stagger */
+  #bookingForm .form-group:nth-child(1) { animation-delay: 0.05s; }
+  #bookingForm .form-group:nth-child(2) { animation-delay: 0.1s; }
+  #bookingForm .form-group:nth-child(3) { animation-delay: 0.15s; }
+  #bookingForm .form-group:nth-child(4) { animation-delay: 0.2s; }
+  #bookingForm .form-group:nth-child(5) { animation-delay: 0.25s; }
+  #bookingForm .form-group:nth-child(6) { animation-delay: 0.3s; }
+
+  /* ── TABLET ── */
+  @media (max-width: 900px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-aside { display: none; }
+    .calendar-panel { border-right: none; border-bottom: 1px solid var(--rule); }
+    .form-panel { position: static; height: auto; overflow-y: visible; }
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 600px) {
+    header { height: 52px; }
+    .hero { padding: 24px 16px 20px; }
+    h1 { font-size: 2rem; }
+    .hero-meta { gap: 14px; }
+    .meta-value { font-size: 0.8rem; }
+    .calendar-panel { padding: 20px 16px; }
+    .slot-pill { height: 26px; }
+    .day-grid { grid-template-columns: repeat(5, minmax(52px, 1fr)); }
+    .form-panel { padding: 20px 16px; }
+    .no-selection-prompt { padding: 16px 12px; font-size: 0.78rem; }
+    .info-strip { grid-template-columns: 1fr 1fr; gap: 16px; }
+  }
+
+  /* ── VERY SMALL ── */
+  @media (max-width: 380px) {
+    .slot-pill { font-size: 0.5rem; height: 24px; }
+    .day-name { font-size: 0.55rem; }
+    .day-date { font-size: 1rem; }
+    .info-strip { grid-template-columns: 1fr; }
+    h1 { font-size: 1.75rem; }
+  }
+
+  /* ── LARGE DESKTOP ── */
+  @media (min-width: 1280px) {
+    .main-grid { grid-template-columns: 1fr 400px; }
+  }
+</style>
+</head>
+<body>
+
+<header id="siteHeader">
+  <a class="logo" href="#">Building <span>Clinic</span></a>
+  <span class="header-tag">Consultation Booking</span>
+</header>
+
+<section class="hero">
+  <div>
+    <div class="hero-eyebrow">Schedule a Session</div>
+    <h1>Book your<br><em>expert consultation</em></h1>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <span class="meta-label">Available</span>
+        <span class="meta-value">Mon – Fri</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Hours</span>
+        <span class="meta-value">7:00 – 9:00 PM SLT</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Session</span>
+        <span class="meta-value">15 or 30 min</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Format</span>
+        <span class="meta-value">Google Meet</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-aside">
+    <div class="hero-mark">BC</div>
+  </div>
+</section>
+
+<div class="main-grid">
+
+  <!-- CALENDAR -->
+  <div class="calendar-panel">
+    <div class="panel-title">Availability</div>
+
+    <div class="week-nav">
+      <button class="nav-btn" id="prevWeek" onclick="changeWeek(-1)" aria-label="Previous week"><span>←</span></button>
+      <span class="week-label" id="weekLabel"></span>
+      <button class="nav-btn" id="nextWeek" onclick="changeWeek(1)" aria-label="Next week"><span>→</span></button>
+    </div>
+
+    <div class="day-grid-wrapper">
+      <div class="day-grid" id="dayGrid"></div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot available"></div> Available</div>
+      <div class="legend-item"><div class="legend-dot booked"></div> Booked</div>
+      <div class="legend-item"><div class="legend-dot past"></div> Unavailable</div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-panel">
+    <div class="panel-title">Your Details</div>
+
+    <div class="no-selection-prompt" id="noSelectionPrompt">
+      ← Select an available<br>time slot to continue
+    </div>
+
+    <div class="selected-slot-display" id="selectedSlotDisplay">
+      <div class="selected-slot-label">Selected Slot</div>
+      <div class="selected-slot-value" id="selectedSlotValue">—</div>
+    </div>
+
+    <div id="bookingForm">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="fullName" placeholder="e.g. Kamal Perera" oninput="updateSubmit()" autocomplete="name">
+      </div>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="your@email.com" oninput="updateSubmit()" autocomplete="email">
+      </div>
+
+      <!-- ── PHONE NUMBER FIELD ── -->
+      <div class="form-group">
+        <label>Phone Number <span style="color:var(--booked);font-size:0.75em">*</span></label>
+        <div class="phone-input-group">
+          <div class="country-select-wrapper">
+            <select id="countryCode" onchange="updateSubmit()" title="Country code">
+              <option value="+94">🇱🇰 +94</option>
+              <option value="+1">🇺🇸 +1</option>
+              <option value="+44">🇬🇧 +44</option>
+              <option value="+91">🇮🇳 +91</option>
+              <option value="+61">🇦🇺 +61</option>
+              <option value="+971">🇦🇪 +971</option>
+              <option value="+65">🇸🇬 +65</option>
+              <option value="+60">🇲🇾 +60</option>
+              <option value="+966">🇸🇦 +966</option>
+              <option value="+974">🇶🇦 +974</option>
+              <option value="+973">🇧🇭 +973</option>
+              <option value="+968">🇴🇲 +968</option>
+              <option value="+64">🇳🇿 +64</option>
+              <option value="+33">🇫🇷 +33</option>
+              <option value="+49">🇩🇪 +49</option>
+              <option value="+81">🇯🇵 +81</option>
+              <option value="+82">🇰🇷 +82</option>
+              <option value="+86">🇨🇳 +86</option>
+              <option value="+7">🇷🇺 +7</option>
+              <option value="+55">🇧🇷 +55</option>
+              <option value="+27">🇿🇦 +27</option>
+              <option value="+234">🇳🇬 +234</option>
+              <option value="+92">🇵🇰 +92</option>
+              <option value="+880">🇧🇩 +880</option>
+              <option value="+977">🇳🇵 +977</option>
+              <option value="+66">🇹🇭 +66</option>
+              <option value="+63">🇵🇭 +63</option>
+              <option value="+62">🇮🇩 +62</option>
+              <option value="+20">🇪🇬 +20</option>
+              <option value="+39">🇮🇹 +39</option>
+              <option value="+34">🇪🇸 +34</option>
+              <option value="+31">🇳🇱 +31</option>
+              <option value="+46">🇸🇪 +46</option>
+              <option value="+47">🇳🇴 +47</option>
+              <option value="+358">🇫🇮 +358</option>
+              <option value="+45">🇩🇰 +45</option>
+              <option value="+41">🇨🇭 +41</option>
+              <option value="+43">🇦🇹 +43</option>
+              <option value="+32">🇧🇪 +32</option>
+              <option value="+351">🇵🇹 +351</option>
+              <option value="+30">🇬🇷 +30</option>
+              <option value="+90">🇹🇷 +90</option>
+              <option value="+98">🇮🇷 +98</option>
+              <option value="+964">🇮🇶 +964</option>
+              <option value="+963">🇸🇾 +963</option>
+              <option value="+961">🇱🇧 +961</option>
+              <option value="+962">🇯🇴 +962</option>
+              <option value="+972">🇮🇱 +972</option>
+            </select>
+          </div>
+          <input type="tel" id="phoneNumber" placeholder="701 877 000" oninput="validatePhone(); updateSubmit();" autocomplete="tel-national" inputmode="numeric">
+        </div>
+        <div class="phone-hint" id="phoneHint">Enter your mobile or WhatsApp number</div>
+      </div>
+
+      <div class="form-group">
+        <label>Service Required</label>
+        <select id="service" onchange="updateSubmit()">
+          <option value="" disabled selected>Select a service…</option>
+          <option>Technical Guidance — New House or Building</option>
+          <option>Ground Improvement for Weak Soil Foundations</option>
+          <option>Foundation Type Selection &amp; Guidance</option>
+          <option>Building Defect Solutions (Cracks, Settlements)</option>
+          <option>Water Supply, Plumbing &amp; Waterproofing</option>
+          <option>Waste Water &amp; Sewage Disposal Guidance</option>
+          <option>Excavation, Earth Cutting, Filling &amp; Retaining Walls</option>
+          <option>Building Materials &amp; New Technology Guidance</option>
+          <option>Building Regulations, BOQ &amp; Estimates</option>
+          <option>Bank Loans &amp; Funding Guidance</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Session Duration</label>
+        <div class="duration-toggle">
+          <button class="duration-btn active" id="btn15" onclick="setDuration(15)"><span>15 min</span></button>
+          <button class="duration-btn" id="btn30" onclick="setDuration(30)"><span>30 min ↗</span></button>
+        </div>
+        <div class="duration-note" id="durationNote">Standard session — free to book if slot is available.</div>
+      </div>
+
+      <div class="form-group">
+        <label>
+          Message
+          <span style="color:var(--ink-faint);font-size:0.63rem;text-transform:none;letter-spacing:0;font-weight:400"> — optional</span>
+        </label>
+        <textarea id="message" placeholder="Briefly describe your situation or what you'd like to discuss…"></textarea>
+      </div>
+
+      <button class="submit-btn" id="submitBtn" onclick="submitBooking()" disabled>
+        <span>Confirm Booking</span>
+        <span class="submit-arrow">→</span>
+      </button>
+    </div>
+
+    <div class="success-state" id="successState">
+      <div class="success-icon">✓</div>
+      <div class="success-title">Booking Received</div>
+      <p class="success-text">
+        A confirmation email is on its way.<br>
+        Your Google Meet link will be included.<br><br>
+        <strong style="color:var(--ink)">Cancellations</strong> must be submitted<br>
+        before 1:00 PM on the day of your meeting.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<div class="info-strip">
+  <div class="info-item">
+    <div class="info-icon">📍</div>
+    <div>
+      <div class="info-label">Location</div>
+      <div class="info-value">Online via Google Meet</div>
+    </div>
+  </div>
+  <div class="info-item">
+    <div class="info-icon">⏰</div>
+    <div>
+      <div class="info-label">Cancellation Policy</div>
+      <div class="info-value">Before 1:00 PM on meeting day</div>
+    </div>
+  </div>
+  <div class="info-item">
+    <div class="info-icon">📞</div>
+    <div>
+      <div class="info-label">Direct Contact</div>
+      <div class="info-value">0701 877 000</div>
+    </div>
+  </div>
+  <div class="info-item">
+    <div class="info-icon">🕐</div>
+    <div>
+      <div class="info-label">Response Time</div>
+      <div class="info-value">Confirmation within minutes</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Replace with your deployed Apps Script URL ──
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwL8NTKGVeGwT0YDZG4RPck40e0-rA4lVEEfk-dNimCiZ3xgWuXNP2OhJbkZP22gXoHyg/exec';
+
+  const SLOT_TIMES  = ["19:00","19:15","19:30","19:45","20:00","20:15","20:30","20:45"];
+  const SLOT_LABELS = ["7:00 PM","7:15 PM","7:30 PM","7:45 PM","8:00 PM","8:15 PM","8:30 PM","8:45 PM"];
+  const DAY_NAMES   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const MONTHS      = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const WEEK_DAYS   = ["Mon","Tue","Wed","Thu","Fri"];
+
+  // Populated dynamically from backend on page load
+  let BOOKED_SLOTS = {};
+
+  let weekOffset   = 0;
+  let selectedSlot = null;
+  let duration     = 15;
+  let phoneValid   = false;
+
+  // ── FETCH BOOKED SLOTS FROM BACKEND ──
+  async function loadBookedSlots() {
+    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
+    try {
+      const res  = await fetch(APPS_SCRIPT_URL, { method: 'GET' });
+      const data = await res.json();
+      if (data.ok && data.booked) {
+        BOOKED_SLOTS = data.booked;
+        renderCalendar();
+      }
+    } catch (err) {
+      console.warn('Could not load booked slots:', err);
+    }
+  }
+
+  // ── HEADER SCROLL SHADOW ──
+  window.addEventListener('scroll', () => {
+    document.getElementById('siteHeader').classList.toggle('scrolled', window.scrollY > 10);
+  });
+
+  // ── PHONE VALIDATION ──
+  function validatePhone() {
+    const val = document.getElementById('phoneNumber').value.trim();
+    const hint = document.getElementById('phoneHint');
+    const digits = val.replace(/[\s\-\(\)]/g, '');
+
+    if (val === '') {
+      hint.textContent = 'Enter your mobile or WhatsApp number';
+      hint.className = 'phone-hint';
+      phoneValid = false;
+    } else if (digits.length < 7 || !/^\d+$/.test(digits)) {
+      hint.textContent = 'Please enter a valid phone number';
+      hint.className = 'phone-hint error';
+      phoneValid = false;
+    } else {
+      hint.textContent = '✓ Looks good';
+      hint.className = 'phone-hint';
+      hint.style.color = 'var(--avail)';
+      phoneValid = true;
+    }
+
+    if (val === '') hint.style.color = '';
+    if (!phoneValid && val !== '') hint.style.color = '';
+  }
+
+  // ── CALENDAR ──
+  function getMonday(offset) {
+    const now  = new Date();
+    const d    = now.getDay();
+    const diff = d === 0 ? -6 : 1 - d;
+    const mon  = new Date(now);
+    mon.setDate(now.getDate() + diff + offset * 7);
+    mon.setHours(0,0,0,0);
+    return mon;
+  }
+
+  function fmtDate(d)  { return d.toISOString().split('T')[0]; }
+  function isToday(d)  { return d.toDateString() === new Date().toDateString(); }
+
+  function isPastDay(d) {
+    const n = new Date(); n.setHours(0,0,0,0);
+    return d < n;
+  }
+
+  function isSlotPast(d, si) {
+    const now = new Date();
+    const [h,m] = SLOT_TIMES[si].split(':').map(Number);
+    const t = new Date(d); t.setHours(h,m,0,0);
+    return t <= now;
+  }
+
+  function isIn2Weeks(d) {
+    const now = new Date(); now.setHours(0,0,0,0);
+    const lim = new Date(now); lim.setDate(now.getDate() + 14);
+    return d >= now && d <= lim;
+  }
+
+  function renderCalendar() {
+    const mon = getMonday(weekOffset);
+    const fri = new Date(mon); fri.setDate(mon.getDate() + 4);
+
+    const fmt = { month: 'short', day: 'numeric' };
+    document.getElementById('weekLabel').textContent =
+      `${mon.toLocaleDateString('en-GB', fmt)} – ${fri.toLocaleDateString('en-GB', fmt)}`;
+
+    document.getElementById('prevWeek').disabled = weekOffset <= 0;
+    const nextMon = new Date(mon); nextMon.setDate(mon.getDate() + 7);
+    document.getElementById('nextWeek').disabled = !isIn2Weeks(nextMon);
+
+    const grid = document.getElementById('dayGrid');
+    grid.innerHTML = '';
+
+    for (let i = 0; i < 5; i++) {
+      const d      = new Date(mon); d.setDate(mon.getDate() + i);
+      const ds     = fmtDate(d);
+      const booked = BOOKED_SLOTS[ds] || [];
+      const dayOld = isPastDay(d) && !isToday(d);
+      const oor    = !isIn2Weeks(d);
+
+      const col = document.createElement('div');
+      col.className = 'day-col';
+      col.style.animationDelay = `${i * 0.05}s`;
+      col.style.animation = 'fadeUp 0.3s ease both';
+
+      col.innerHTML = `
+        <div class="day-header">
+          <span class="day-name">${WEEK_DAYS[i]}</span>
+          <span class="day-date${isToday(d)?' today':''}">${d.getDate()}</span>
+        </div>`;
+
+      SLOT_TIMES.forEach((_, si) => {
+        const pill  = document.createElement('div');
+        const past  = dayOld || oor || isSlotPast(d, si);
+        const taken = booked.includes(si);
+        const isSel = selectedSlot && selectedSlot.date === ds && selectedSlot.si === si;
+
+        pill.className = 'slot-pill ' + (
+          isSel  ? 'selected'  :
+          past   ? 'past'      :
+          taken  ? 'booked'    : 'available'
+        );
+
+        pill.textContent = SLOT_LABELS[si].replace(' PM','');
+        pill.setAttribute('role', 'button');
+        pill.setAttribute('aria-label', `${WEEK_DAYS[i]} ${d.getDate()} at ${SLOT_LABELS[si]}`);
+
+        if (!past && !taken) {
+          pill.onclick = () => selectSlot(d, si, ds);
+        }
+
+        col.appendChild(pill);
+      });
+
+      grid.appendChild(col);
+    }
+  }
+
+  function selectSlot(d, si, ds) {
+    selectedSlot = { date: ds, si, d };
+
+    const label = `${DAY_NAMES[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]} — ${SLOT_LABELS[si]}`;
+    document.getElementById('selectedSlotValue').textContent = label;
+    document.getElementById('selectedSlotDisplay').classList.add('visible');
+    document.getElementById('noSelectionPrompt').style.display = 'none';
+
+    // Animate form fields in
+    document.querySelectorAll('#bookingForm .form-group').forEach((g, i) => {
+      g.style.animation = 'none';
+      g.offsetHeight; // reflow
+      g.style.animation = `fadeUp 0.4s ${i * 0.06}s ease both`;
+    });
+
+    updateSubmit();
+    renderCalendar();
+
+    if (window.innerWidth < 900) {
+      setTimeout(() => {
+        document.querySelector('.form-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }
+
+  function setDuration(min) {
+    duration = min;
+    document.getElementById('btn15').classList.toggle('active', min === 15);
+    document.getElementById('btn30').classList.toggle('active', min === 30);
+    document.getElementById('durationNote').textContent = min === 15
+      ? 'Standard session — free to book if slot is available.'
+      : 'Extended session — subject to admin approval & next slot availability.';
+  }
+
+  function updateSubmit() {
+    const phone = document.getElementById('phoneNumber').value.trim();
+    const phoneDigits = phone.replace(/[\s\-\(\)]/g, '');
+    const phoneOk = phoneDigits.length >= 7 && /^\d+$/.test(phoneDigits);
+
+    const ok = selectedSlot
+      && document.getElementById('fullName').value.trim()
+      && document.getElementById('email').value.trim()
+      && document.getElementById('service').value
+      && phoneOk;
+
+    document.getElementById('submitBtn').disabled = !ok;
+  }
+
+  async function submitBooking() {
+    const countryCode = document.getElementById('countryCode').value;
+    const phoneNum    = document.getElementById('phoneNumber').value.trim();
+    const fullPhone   = countryCode + ' ' + phoneNum;
+
+    const payload = {
+      name:     document.getElementById('fullName').value.trim(),
+      email:    document.getElementById('email').value.trim(),
+      phone:    fullPhone,
+      service:  document.getElementById('service').value,
+      message:  document.getElementById('message').value.trim(),
+      date:     selectedSlot.date,
+      slot:     SLOT_TIMES[selectedSlot.si],
+      duration,
+    };
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span>Sending…</span>';
+
+    // If no backend URL is set yet, show success directly (dev/demo mode)
+    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+      setTimeout(() => {
+        document.getElementById('bookingForm').style.display = 'none';
+        document.getElementById('selectedSlotDisplay').style.display = 'none';
+        document.getElementById('successState').classList.add('visible');
+      }, 800);
+      return;
+    }
+
+    try {
+      const res  = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        // Mark the just-booked slot locally so it shows as taken immediately
+        if (!BOOKED_SLOTS[selectedSlot.date]) BOOKED_SLOTS[selectedSlot.date] = [];
+        BOOKED_SLOTS[selectedSlot.date].push(selectedSlot.si);
+
+        document.getElementById('bookingForm').style.display = 'none';
+        document.getElementById('selectedSlotDisplay').style.display = 'none';
+        document.getElementById('successState').classList.add('visible');
+      } else {
+        throw new Error(data.error || 'Unknown error');
+      }
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = '<span>Confirm Booking</span><span class="submit-arrow">→</span>';
+      alert('Error: ' + err.message + '\n\nPlease try again or contact us directly.');
+    }
+  }
+
+  function changeWeek(dir) {
+    const lbl = document.getElementById('weekLabel');
+    lbl.classList.add('changing');
+    setTimeout(() => {
+      weekOffset += dir;
+      renderCalendar();
+      lbl.classList.remove('changing');
+    }, 150);
+  }
+
+  // Init: render calendar, then load live booked slots from backend
+  renderCalendar();
+  loadBookedSlots();
+</script>
+</body>
+</html>
