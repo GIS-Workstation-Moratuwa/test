@@ -941,7 +941,7 @@
 
 <script>
   // ── Replace with your deployed Apps Script URL ──
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQEXjeBbirA-8TMI8cDF59B2tFFm0mOkDzIHvxJKEqK6jw3-ZR8ivdvfjiUcoMehhxiQ/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwiuEkDdK4Oaw4LN1vHD7skaMW9EuTqQyxHQGCVfjtuxKUvaHrVK5D0RjK-OFGkERK-ag/exec';
 
   const SLOT_TIMES  = ["19:00","19:15","19:30","19:45","20:00","20:15","20:30","20:45"];
   const SLOT_LABELS = ["7:00 PM","7:15 PM","7:30 PM","7:45 PM","8:00 PM","8:15 PM","8:30 PM","8:45 PM"];
@@ -959,7 +959,7 @@
 
   // ── FETCH BOOKED SLOTS FROM BACKEND ──
   async function loadBookedSlots() {
-    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwQEXjeBbirA-8TMI8cDF59B2tFFm0mOkDzIHvxJKEqK6jw3-ZR8ivdvfjiUcoMehhxiQ/exec') return;
+    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwiuEkDdK4Oaw4LN1vHD7skaMW9EuTqQyxHQGCVfjtuxKUvaHrVK5D0RjK-OFGkERK-ag/exec') return;
     try {
       // GET is always a simple request — no CORS preflight needed
       const res  = await fetch(APPS_SCRIPT_URL, { method: 'GET', redirect: 'follow' });
@@ -1165,7 +1165,7 @@
     btn.innerHTML = '<span>Sending…</span>';
 
     // If no backend URL is set yet, show success directly (dev/demo mode)
-    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwQEXjeBbirA-8TMI8cDF59B2tFFm0mOkDzIHvxJKEqK6jw3-ZR8ivdvfjiUcoMehhxiQ/exec') {
+    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwiuEkDdK4Oaw4LN1vHD7skaMW9EuTqQyxHQGCVfjtuxKUvaHrVK5D0RjK-OFGkERK-ag/exec') {
       setTimeout(() => {
         document.getElementById('bookingForm').style.display = 'none';
         document.getElementById('selectedSlotDisplay').style.display = 'none';
