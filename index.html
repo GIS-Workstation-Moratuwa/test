@@ -941,7 +941,7 @@
 
 <script>
   // ── Replace with your deployed Apps Script URL ──
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwL8NTKGVeGwT0YDZG4RPck40e0-rA4lVEEfk-dNimCiZ3xgWuXNP2OhJbkZP22gXoHyg/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQEXjeBbirA-8TMI8cDF59B2tFFm0mOkDzIHvxJKEqK6jw3-ZR8ivdvfjiUcoMehhxiQ/exec';
 
   const SLOT_TIMES  = ["19:00","19:15","19:30","19:45","20:00","20:15","20:30","20:45"];
   const SLOT_LABELS = ["7:00 PM","7:15 PM","7:30 PM","7:45 PM","8:00 PM","8:15 PM","8:30 PM","8:45 PM"];
@@ -959,10 +959,12 @@
 
   // ── FETCH BOOKED SLOTS FROM BACKEND ──
   async function loadBookedSlots() {
-    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
+    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwQEXjeBbirA-8TMI8cDF59B2tFFm0mOkDzIHvxJKEqK6jw3-ZR8ivdvfjiUcoMehhxiQ/exec') return;
     try {
-      const res  = await fetch(APPS_SCRIPT_URL, { method: 'GET' });
-      const data = await res.json();
+      // GET is always a simple request — no CORS preflight needed
+      const res  = await fetch(APPS_SCRIPT_URL, { method: 'GET', redirect: 'follow' });
+      const text = await res.text();
+      const data = JSON.parse(text);
       if (data.ok && data.booked) {
         BOOKED_SLOTS = data.booked;
         renderCalendar();
@@ -1163,7 +1165,7 @@
     btn.innerHTML = '<span>Sending…</span>';
 
     // If no backend URL is set yet, show success directly (dev/demo mode)
-    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwQEXjeBbirA-8TMI8cDF59B2tFFm0mOkDzIHvxJKEqK6jw3-ZR8ivdvfjiUcoMehhxiQ/exec') {
       setTimeout(() => {
         document.getElementById('bookingForm').style.display = 'none';
         document.getElementById('selectedSlotDisplay').style.display = 'none';
@@ -1173,15 +1175,22 @@
     }
 
     try {
-      const res  = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+      // IMPORTANT: Use text/plain to avoid CORS preflight with Apps Script.
+      // application/json triggers an OPTIONS preflight that Apps Script rejects.
+      // text/plain is a "simple request" — no preflight, no CORS error.
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method:   'POST',
+        redirect: 'follow',
+        headers:  { 'Content-Type': 'text/plain;charset=utf-8' },
+        body:     JSON.stringify(payload),
       });
-      const data = await res.json();
+
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); }
+      catch (_) { throw new Error('Unexpected server response. Check your Apps Script URL.'); }
 
       if (data.ok) {
-        // Mark the just-booked slot locally so it shows as taken immediately
         if (!BOOKED_SLOTS[selectedSlot.date]) BOOKED_SLOTS[selectedSlot.date] = [];
         BOOKED_SLOTS[selectedSlot.date].push(selectedSlot.si);
 
@@ -1189,12 +1198,12 @@
         document.getElementById('selectedSlotDisplay').style.display = 'none';
         document.getElementById('successState').classList.add('visible');
       } else {
-        throw new Error(data.error || 'Unknown error');
+        throw new Error(data.error || 'Unknown server error');
       }
     } catch (err) {
       btn.disabled = false;
       btn.innerHTML = '<span>Confirm Booking</span><span class="submit-arrow">→</span>';
-      alert('Error: ' + err.message + '\n\nPlease try again or contact us directly.');
+      alert('Booking failed: ' + err.message + '\n\nPlease try again or call 0701 877 000.');
     }
   }
 
