@@ -821,7 +821,11 @@
 
   // ── STATE ────────────────────────────────────────────────────────
   let BOOKED_SLOTS  = {};
-  let weekOffset    = 0;
+  // If today is Saturday (6) or Sunday (0) the Mon–Fri week has already passed;
+  // start one week ahead so the calendar never opens on an all-grey week.
+  const _todayDow      = new Date().getDay();
+  const MIN_WEEK_OFFSET = (_todayDow === 0 || _todayDow === 6) ? 1 : 0;
+  let weekOffset    = MIN_WEEK_OFFSET;
   let selectedSlot  = null;
   let duration      = 15;
   let phoneValid    = false;
@@ -984,7 +988,12 @@
     return mon;
   }
 
-  function fmtDate(d) { return d.toISOString().split('T')[0]; }
+  function fmtDate(d) {
+    const y  = d.getFullYear();
+    const m  = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${dd}`;
+  }
   function isToday(d) { return d.toDateString() === new Date().toDateString(); }
 
   function isPastDay(d) {
@@ -996,7 +1005,7 @@
     const now   = new Date();
     const [h,m] = SLOT_TIMES[si].split(':').map(Number);
     const t     = new Date(d); t.setHours(h, m, 0, 0);
-    return t <= now;
+    return t < now;
   }
 
   function isIn2Weeks(d) {
@@ -1079,7 +1088,7 @@
     const fri    = new Date(mon); fri.setDate(mon.getDate() + 4);
     document.getElementById('weekLabel').textContent =
       `${mon.toLocaleDateString('en-GB', fmt)} – ${fri.toLocaleDateString('en-GB', fmt)}`;
-    document.getElementById('prevWeek').disabled = weekOffset <= 0;
+    document.getElementById('prevWeek').disabled = weekOffset <= MIN_WEEK_OFFSET;
     const nextMon = new Date(mon); nextMon.setDate(mon.getDate() + 7);
     document.getElementById('nextWeek').disabled = !isIn2Weeks(nextMon);
   }
@@ -1143,7 +1152,7 @@
   }
 
   // ── INIT ─────────────────────────────────────────────────────────
-  const _initMon = getMonday(0);
+  const _initMon = getMonday(weekOffset);
   buildCalendarDOM(document.getElementById('dayGrid'), _initMon);
   updateWeekNav(_initMon);
   loadBookedSlots();
